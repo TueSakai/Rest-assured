@@ -1,39 +1,27 @@
 package StepDefinitions;
 
 
-import groovy.xml.XmlParser;
+import com.google.gson.JsonObject;
 import io.cucumber.java.en.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
-import io.restassured.internal.util.IOUtils;
 import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
+import io.restassured.path.xml.config.XmlPathConfig;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSender;
 import io.restassured.specification.RequestSpecification;
-import org.apache.http.entity.StringEntity;
-import org.json.simple.JSONObject;
-import org.testng.Assert;
+
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.xml.sax.*;
 import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
 import java.io.*;
-import javax.xml.*;
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-
-import static io.restassured.config.XmlConfig.xmlConfig;
 
 public class Steps {
     @Given("GET demo request 1")
@@ -58,11 +46,16 @@ public class Steps {
         RestAssured.baseURI = "https://reqres.in/api/users";
         RequestSpecification httpRequest = RestAssured.given();
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("name","Nittin");
-        requestBody.put("job","Test enginner");
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("name","Nittin");
+        requestBody.addProperty("job","Test enginner");
 
-        httpRequest.body(requestBody.toJSONString());
+//        JSONObject requestBody = new JSONObject();
+//        requestBody.put("name","Nittin");
+//        requestBody.put("job","Test enginner");
+
+//        httpRequest.body(requestBody.toJSONString());
+        httpRequest.body(requestBody);
 
         Response response = httpRequest.request(Method.POST);
         JsonPath jsonPath = new JsonPath(response.getBody().asString());
@@ -73,16 +66,20 @@ public class Steps {
         RestAssured.baseURI = "https://reqres.in/api/login";
         RequestSpecification httpRequest = RestAssured.given();
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("email","eve.holt@reqres.in");
-        requestBody.put("password","cityslicka");
+//        JSONObject requestBody = new JSONObject();
+//        requestBody.put("email","eve.holt@reqres.in");
+//        requestBody.put("password","cityslicka");
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("email","eve.holt@reqres.in");
+        requestBody.addProperty("password","cityslicka");
 
         httpRequest.header("Content-Type","application/json");
-        httpRequest.body(requestBody.toJSONString());
+//        httpRequest.body(requestBody.toJSONString());
+        httpRequest.body(requestBody);
 
         Response response = httpRequest.request(Method.POST);
         String responseBody = response.getBody().asString();
-        JsonPath jsonPath = new JsonPath(response.getBody().asString());
+        JsonPath jsonPath = new JsonPath(responseBody);
         jsonPath.prettyPrint();
     }
     @Then("POST demo request 3")
@@ -90,15 +87,20 @@ public class Steps {
         RestAssured.baseURI = "https://reqres.in/api/login";
         RequestSpecification httpRequest = RestAssured.given();
 
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("email","Nitin@gmail.com");
+//        JSONObject requestBody = new JSONObject();
+//        requestBody.put("email","Nitin@gmail.com");
+
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("email","Nitin@gmail.com");
 
         httpRequest.header("Content-Type","application/json");
-        httpRequest.body(requestBody.toJSONString());
+
+//        httpRequest.body(requestBody.toJSONString());
+        httpRequest.body(requestBody);
 
         Response response = httpRequest.request(Method.POST);
         String responseBody = response.getBody().asString();
-        JsonPath jsonPath = new JsonPath(response.getBody().asString());
+        JsonPath jsonPath = new JsonPath(responseBody);
         jsonPath.prettyPrint();
     }
     @Test
@@ -106,15 +108,16 @@ public class Steps {
     public void POST_RESTAssuredSOAPAPI() throws Exception{
         String requestBody = new String(Files.readAllBytes(Paths.get("src/test/java/StepDefinitions/addition-requestbody.xml")));
         System.out.println();
-        Response response =  RestAssured
+
+        RequestSpecification request =  RestAssured
                 .given().request().header("SOAPAction","authenticate")
                 .baseUri("http://restapi.adequateshop.com")
                 .basePath("/api/Traveler")
                 .contentType("application/xml")
                 .accept(ContentType.XML)
                 .and()
-                .body(requestBody)
-                .when().post();
+                .body(requestBody);
+        Response response = request.request(Method.POST);
         XmlPath jsXpath = new XmlPath(response.getBody().asString());
         System.out.println("\n=========================================\n");
         jsXpath.prettyPrint();
