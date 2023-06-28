@@ -1,6 +1,8 @@
 package StepDefinitions;
 
 
+import action.JSONAction.BasePage;
+import action.PostRequest.InitUser;
 import com.google.gson.JsonObject;
 import io.cucumber.java.en.*;
 import io.restassured.RestAssured;
@@ -22,8 +24,10 @@ import javax.xml.parsers.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.*;
 
 public class Steps {
+    InitUser initUser = new InitUser();
     @Given("GET demo request 1")
     public void GET_request_1() {
         RestAssured.baseURI = "https://reqres.in/api/user?page=2";
@@ -33,29 +37,27 @@ public class Steps {
         jsonPath.prettyPrint();
 
     }
+    @Test
     @Given("GET demo request 2")
     public void GET_request_2() {
-        RestAssured.baseURI = "https://reqres.in/api/user/2";
-        RequestSpecification httpRequest = RestAssured.given();
+//        String url = "https://reqres.in";
+//        String path = "/api/user/2";
+//        String response = getJSONResponse(getJSONRequest(url, path),"GET");
+//        JsonPath jsonPath = new JsonPath(response);
+//        jsonPath.prettyPrint();
+        RestAssured.baseURI = "https://reqres.in/api/user";
+        RequestSpecification httpRequest = RestAssured.given().param("page","2");
         Response response = httpRequest.request(Method.GET);
         JsonPath jsonPath = new JsonPath(response.getBody().asString());
         jsonPath.prettyPrint();
     }
+    @Test
     @When("POST demo request 1")
     public void POST_request_1() {
-        RestAssured.baseURI = "https://reqres.in/api/users";
-        RequestSpecification httpRequest = RestAssured.given();
-
-        JsonObject requestBody = new JsonObject();
-        requestBody.addProperty("name","Nittin");
-        requestBody.addProperty("job","Test enginner");
-
-        httpRequest.body(requestBody);
-
-        Response response = httpRequest.request(Method.POST);
-        JsonPath jsonPath = new JsonPath(response.getBody().asString());
-        jsonPath.prettyPrint();
+//        initUser.Init_user();
+        initUser.getUser();
     }
+
     @Test
     @When("POST demo request 2")
     public void POST_request_2() throws Exception{
@@ -148,4 +150,8 @@ public class Steps {
         System.out.println("\nEmail is: " + rootElement.getElementsByTagName("email").item(0).getTextContent());
         System.out.println("\nAdderes is: " + rootElement.getElementsByTagName("adderes").item(0).getTextContent());
     }
+
+    public static void main(String[] args) {
+    }
+
 }
